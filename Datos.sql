@@ -59,7 +59,7 @@ VALUES	(1000,'Javier','Angelelli','1990/01/01','M'),
 		(8000,'Federico','Rocca','1960/07/07','M'),
 		(9000,'Magalí','Albornoz','1997/08/08','F');
 go
-insert into ActSedeXSocio (ID_Legajo,ID_Actividades_PK,Beca)
+insert into Inscripciones (ID_Legajo,ID_Actividades_PK,Beca)
 values	(1000,1,0),
 		(1000,3,0),
 		(1000,2,0),
@@ -85,6 +85,6 @@ Values
 (7,	7,	'10:00','10:45'),
 (8,	1,	'21:00','22:30'),
 (9,	2,	'8:00',	'12:00'),
-(10,	3,'10:00','12:00'),
+(10,3,	'10:00','12:00'),
 (1,	4,	'21:00','22:00'),
 (2,	5,	'18:00','20:00');

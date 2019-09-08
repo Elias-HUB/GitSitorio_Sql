@@ -43,19 +43,24 @@ Create table Inscripciones (
 ID_Legajo int not null foreign key references Socios(Legajo),
 ID_Actividades_PK TINYINT NULL foreign key  references Actividades (Actividades_PK),
 Beca bit not null,
-FechaInsc Date not null,
-Periodo Date not null,
+FechaInsc Date  null,
 )
 go
 create table Pagos(
+ID_Pago bigINT NOT NULL PRIMARY KEY IDENTITY (1,1),
 ID_Socio int not null foreign key references Socios(Legajo),
-Importe float not null check (Importe >0),
+Importe float not null check (Importe >=0),
 FechaPago date null,
+Periodo Date null,
+UNIQUE  (ID_Socio,Periodo),
 )
 go
 create table Horarios(
+ID_Horario bigINT NOT NULL PRIMARY KEY IDENTITY (1,1),
 ID_Actividades_PK TINYINT NULL foreign key  references Actividades (Actividades_PK),
 Dia int not null check (Dia >0 and Dia <8), 
-HoraInicio time not null,
-HoraFin time not null,
+HoraInicio time not null check (HoraInicio Between '07:00' and '23:00'),
+HoraFin time not null check (Horafin Between '08:00' and '23:00'),
+UNIQUE (ID_Actividades_PK,HoraInicio,Dia)
 )
+
