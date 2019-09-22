@@ -51,7 +51,10 @@ use Club
 	Select * From Socios where Apellidos like '_____a'
 
 --14) Listar el legajo, apellido, nombres y edad de cada socio.
-	SELECT LEGAJO, APELLIDOs, NOMBREs, DATEDIFF(YEAR, 0, GETDATE() - FechaNacimiento) AS EDAD FROM Socios
+	SELECT LEGAJO, APELLIDOs, NOMBREs, DATEDIFF(DAY, FechaNacimiento, GETDATE())/365.25 AS EDAD FROM Socios
+	SELECT LEGAJO, APELLIDOs, NOMBREs, DATEDIFF(YEAR, 0, GETDATE() - '2000-09-09') AS EDAD, FechaNacimiento FROM Socios
+
+	
 
 --15) Listar todas las actividades que se realizan en la Sede 1.
 	select * From Actividades where IDSede = 1 
@@ -96,7 +99,10 @@ use Club
 
 --24) Listar el legajo, número de actividad y como Estado la palabra 'Becado' si el socio se encuentra
 --becado, de lo contrario listar null en el Estado del socio.
-	select Legajo, IDActividad, * from Inscripciones
-
 	SELECT  Legajo, IDActividad,CASE  WHEN Becado=1 THEN 'BECADO'
-	 ELSE 'NO BECADO' END AS 'ESTADO' FROM Inscripciones
+	ELSE NULL END AS 'ESTADO', Becado FROM Inscripciones
+	order by Legajo asc
+
+
+
+	select * from Inscripciones
