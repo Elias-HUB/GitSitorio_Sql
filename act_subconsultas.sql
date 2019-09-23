@@ -45,13 +45,14 @@
 													)
 
 --9) Las actividades cuyo costo sea mayor a cualquier actividad que se realice en la Sede 2.
-
+			select * from Actividades where Costo > 
+			(Select MIN (Costo) from Actividades where IDSede = 2 )
 
 --10) Por cada actividad, el nombre y la cantidad de inscriptos de personas de género masculino y la cantidad de
 --inscriptos de personas de género femenino.
 		Select A.Nombre,
-		(Select count (*) from Inscripciones as I		inner join Socios as S 
-		on i.Legajo = s.Legajo 		where i.IDActividad = A.ID and s.Genero = 'M') as Masculino,
+		(Select count (*) from Inscripciones 		inner join Socios 
+		on Inscripciones.Legajo = Socios.Legajo 		where Inscripciones.IDActividad = A.ID and Socios.Genero = 'M') as Masculino,
 		(Select count (*) from Inscripciones as I		inner join Socios as S 
 		on i.Legajo = s.Legajo 		where i.IDActividad = A.ID and s.Genero = 'F') as Femenino
 		from Actividades as A
@@ -63,7 +64,7 @@
 		(Select count (*) from Inscripciones as I		inner join Socios as S 
 		on i.Legajo = s.Legajo 		where i.IDActividad = A.ID and s.Genero = 'F') as Femenino
 		from Actividades as A) as a
-		where a.Masculino > a.Femenino and a.Femenino > 0
+		where a.Masculino > 0 and a.Femenino > 0
 
 		select * from Inscripciones
 
@@ -80,22 +81,59 @@
 
 --12) La cantidad de actividades que registraron la misma cantidad de socios de género masculino
 --que socios de género femenino.
+	Select * from (
+	Select Actividades.Nombre,
+	(Select Count (*) from Inscripciones inner join Socios 
+	 on Inscripciones.Legajo = Socios.Legajo where Socios.Genero = 'M' and Inscripciones.IDActividad = Actividades.ID) as 'M',
+	 (Select Count (*) from Inscripciones inner join Socios 
+	 on Inscripciones.Legajo = Socios.Legajo where Socios.Genero = 'F' and Inscripciones.IDActividad = Actividades.ID) as 'f' from Actividades )
+	 as a
+	 where M = f
 
+	Select * from Socios
+	select * from Actividades
+	select * from Inscripciones
 
 --13) El porcentaje de inscripciones realizadas en el año actual con respecto al total de inscripciones.
-
+Select Distinct  CONVERT(decimal(4,2),(select count (*) from Inscripciones where year (FechaInscripcion) = 2019) *100 /
+ (Select count (*) from Inscripciones))  from Inscripciones
 
 --14) Las actividades que registran la misma cantidad de socios de género masculino que socios de
 --género femenino.
 
+Select * from (
+select nombre,
+(select count (*) from Inscripciones
+ inner join Socios on Inscripciones.Legajo = Socios.Legajo
+ where Inscripciones.IDActividad = a.ID and Socios.Genero = 'M') as 'm',
+ (select count (*) from Inscripciones
+ inner join Socios on Inscripciones.Legajo = Socios.Legajo
+ where Inscripciones.IDActividad = a.ID and Socios.Genero = 'F') AS 'f'
+  from Actividades as a) AS Tabla
+  where m=f
 
 --15) Los socios que realizan únicamente actividades que no requiere apto médico.
-
+select * from
+	(select Socios.Legajo,socios.Nombres,
+	(Select count (*) from Inscripciones inner join Actividades
+	on Inscripciones.IDActividad = Actividades.ID where Socios.Legajo = Inscripciones.Legajo and Actividades.AptoMedico = 1) as 'Apto Medico',
+	(Select count (*) from Inscripciones inner join Actividades
+	on Inscripciones.IDActividad = Actividades.ID where Socios.Legajo = Inscripciones.Legajo and Actividades.AptoMedico = 0) as 'No apto medico'
+	 from Socios 		) as tabla
+	 where [No apto medico] > 0 and [Apto Medico] = 0
 			
-			
-			Select * from Inscripciones order by IDActividad asc
+			Select * from Inscripciones where Inscripciones.Legajo = 1000
 			select * from Socios
 			select * from Actividades 
 --16) Los socios que realicen más actividades que requieren apto médico que actividades que no lo
 --requieran y que al menos realicen una actividad que no requiera apto médico (XLS).
+
+	select * from
+	(select Socios.Legajo,socios.Nombres,
+	(Select count (*) from Inscripciones inner join Actividades
+	on Inscripciones.IDActividad = Actividades.ID where Socios.Legajo = Inscripciones.Legajo and Actividades.AptoMedico = 1) as 'Apto Medico',
+	(Select count (*) from Inscripciones inner join Actividades
+	on Inscripciones.IDActividad = Actividades.ID where Socios.Legajo = Inscripciones.Legajo and Actividades.AptoMedico = 0) as 'No apto medico'
+	 from Socios 		) as tabla
+	 where [No apto medico] < [Apto Medico]  and [No apto medico] > 0
 
