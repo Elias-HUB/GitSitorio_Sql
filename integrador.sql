@@ -13,7 +13,7 @@ order by FECHAINGRESO asc
 
 --D) Listar todos los médicos que tengan un costo de consulta mayor a $ 650.
 
-select * from MEDICOS where COSTO_CONSULTA >= 1000 and SEXO= 'F'
+select * from MEDICOS where COSTO_CONSULTA >= 650 and SEXO= 'F'
 
 --E) Listar todos los médicos que tengan una antigüedad mayor a 10 años.
 Select * from (
@@ -44,7 +44,8 @@ select * from TURNOS where  DATEDIFF(day,FECHAHORA,GETDATE()) < 45
 Select IDPACIENTE,Nombre,Apellido from PACIENTES as P where p.IDPACIENTE =
 (select IDPACIENTE from TURNOS as T where T.IDMEDICO = 
 (select M.IDMEDICO from MEDICOS as M inner join ESPECIALIDADES as e 
-on m.IDESPECIALIDAD = e.IDESPECIALIDAD and e.NOMBRE = 'Gastroenterología' where m.IDMEDICO = t.IDMEDICO) and p.IDPACIENTE = t.IDPACIENTE)
+on m.IDESPECIALIDAD = e.IDESPECIALIDAD and e.NOMBRE = 'Gastroenterología' where m.IDMEDICO = t.IDMEDICO) 
+and p.IDPACIENTE = t.IDPACIENTE)
 
 --J) Listar Apellido, nombre, sexo y especialidad de todos los médicos que tengan especialidad
 --en algún tipo de 'Análisis'
@@ -82,8 +83,8 @@ order by FECHAHORA asc
 
 --M) Listar todos los pacientes que no se hayan atendido con ningún médico.
 
-Select * from PACIENTES left join turnos 
-on PACIENTES.IDPACIENTE = TURNOS.IDPACIENTE  where TURNOS.IDPACIENTE is null
+Select * from PACIENTES as P left join turnos 
+on P.IDPACIENTE = TURNOS.IDPACIENTE  where TURNOS.IDPACIENTE is null
 
 --N) Listar por cada año, mes y paciente la cantidad de turnos solicitados. Del paciente mostrar
 --Apellido y nombre.
