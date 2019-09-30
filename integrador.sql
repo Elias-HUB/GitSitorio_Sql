@@ -97,12 +97,15 @@ group by YEAR(t.FECHAHORA) ,MONTH (t.FECHAHORA), PACIENTES.NOMBRE , PACIENTES.AP
 
 --Ñ) Listar el/los paciente que haya tenido el turno con mayor duración.
 
-
+Select top (1) with ties t.DURACION, P.NOMBRE, p.APELLIDO from PACIENTES as P inner join TURNOS as T
+on t.IDPACIENTE = p.IDPACIENTE
+order by t.DURACION desc
 
 --O) Listar el promedio de duración de un turno que pertenezcan a médicos con especialidad
 --'Pediatría'.
 
-
+SElect AVG (DURACION) from TURNOS as T inner join MEDICOS as M on M.IDMEDICO = t.IDMEDICO inner join ESPECIALIDADES as e on e.IDESPECIALIDAD = m.IDESPECIALIDAD
+where e.NOMBRE ='Pediatría'
 
 --P) Listar por cada médico, el total facturado (sin descuentos) agrupado por año. Listar apellido
 --y nombre del médico.
@@ -112,23 +115,31 @@ group by YEAR(t.FECHAHORA) ,MONTH (t.FECHAHORA), PACIENTES.NOMBRE , PACIENTES.AP
 --Q) Listar por cada especialidad la cantidad de turnos que se solicitaron en total. Listar nombre
 --de la especialidad.
 
-
+select e.NOMBRE , 
+(SElect count (*) from TURNOS inner join MEDICOS on MEDICOS.IDMEDICO = turnos.IDMEDICO where MEDICOS.IDESPECIALIDAD = e.IDESPECIALIDAD) AS A
+ from ESPECIALIDADES as e
 
 --R) Listar por cada obra social, la cantidad de turnos
 
-
+select e.NOMBRE , 
+(SElect count (*) from TURNOS inner join PACIENTES on PACIENTES.IDPACIENTE = turnos.IDPACIENTE where PACIENTES.IDOBRASOCIAL= e.IDOBRASOCIAL) AS A
+ from OBRAS_SOCIALES as e
 
 --S) Listar todos los médicos que nunca atendieron a pacientes con Obra Social 'Dasuten'.
 
-
+Select * from MEDICOS as MED where med.IDMEDICO not in (
+Select m.IDMEDICO from MEDICOS as M inner join TURNOS as T on t.IDMEDICO = m.IDMEDICO inner join PACIENTES as P
+on p.IDPACIENTE = t.IDPACIENTE inner join OBRAS_SOCIALES as O on O.IDOBRASOCIAL = p.IDOBRASOCIAL
+where o.NOMBRE = 'DASUTEN' )
 
 --T) Listar todos los pacientes que no se atendieron durante todo el año 2015.
-
-
+Select * from PACIENTES AS PA where PA.IDPACIENTE not in (
+Select distinct p.IDPACIENTE from PACIENTES as p inner join TURNOS as T on t.IDPACIENTE = p.IDPACIENTE
+where Year(t.FECHAHORA) = 2015)
 
 --U) Listar para cada paciente la cantidad de turnos solicitados con médicos que realizan
 --"Análisis" y la cantidad de turnos solicitados con médicos de otras especialidades.
-
+¨|
 
 
 --V) Listar todos los médicos que no atendieron nunca por la mañana. Horario de 08:00 a 12:00.
@@ -141,22 +152,32 @@ group by YEAR(t.FECHAHORA) ,MONTH (t.FECHAHORA), PACIENTES.NOMBRE , PACIENTES.AP
 
 --X) Listar las obras sociales que tengan más de 10 afiliados en la clínica.
 
+select o.IDOBRASOCIAL, o.NOMBRE, COUNT (*) from OBRAS_SOCIALES as O inner join
+PACIENTES on PACIENTES.IDOBRASOCIAL = o.IDOBRASOCIAL
+group by o.IDOBRASOCIAL, o.NOMBRE
+having COUNT (*) > 10
 
 
 --Y) Listar todos los pacientes que se hayan atendido con médicos de otras especialidades pero
 --no se hayan atendido con médicos que realizan "Análisis".
-
-
+Select * from (
+Select IDPACIENTE from  PACIENTES where IDPACIENTE not in (
+Select p.IDPACIENTE from PACIENTES as P inner join TURNOS as T on t.IDPACIENTE = p.IDPACIENTE
+inner join MEDICOS as M on m.IDMEDICO = t.IDMEDICO inner join ESPECIALIDADES as e on m.IDESPECIALIDAD = e.IDESPECIALIDAD 
+ where e.NOMBRE like '%Análisis%' )) As Tabla inner join TURNOS as Tu on tu.IDPACIENTE = Tabla.IDPACIENTE
+ 
 
 --Z) Listar todos los pacientes cuyo promedio de duración por turno sea mayor a 20 minutos.
 
-
+select distinct IDPACIENTE , avg (DURACION) from TURNOS
+group by (IDPACIENTE)
+having avg (DURACION) > 20
 
 --¿Cuántos pacientes distintos se atendieron en turnos que duraron más que la duración promedio?
 
 Select * from PACIENTES
 Select  * from TURNOS where duracion > (Select avg(DURACION) from TURNOS)  
-Select count(distinct idpaciente) from TURNOS where duracion > (Select avg(DURACION) from TURNOS)  order  by DuraCION ASC
+Select count(distinct idpaciente) from TURNOS where duracion > (Select avg(DURACION) from TURNOS)  
 --¿Cuánto tuvo que pagar la consulta el paciente con el turno nro 146?
 
 --Teniendo en cuenta que el paciente debe pagar el costo de la consulta del médico menos lo que
